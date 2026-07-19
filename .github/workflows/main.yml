@@ -1,0 +1,22 @@
+name: Build Android APK
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build with Buildozer
+      uses: ArtemSanya/buildozer-action@v1
+      with:
+        workdir: .
+        buildozer_version: stable
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: QuantumChat-APK
+        path: bin/*.apk
