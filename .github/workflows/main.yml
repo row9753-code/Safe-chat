@@ -1,22 +1,39 @@
 name: Build Android APK
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev lldd lld cmake
+        pip install --upgrade pip
+        pip install buildozer cython virtualenv kivy
 
     - name: Build with Buildozer
-      uses: ArtemSanya/buildozer-action@v1
-      with:
-        workdir: .
-        buildozer_version: stable
+      run: |
+        buildozer android debug
+      env:
+        ACCEPT_SDK_LICENSE: "y"
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v2
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
       with:
         name: QuantumChat-APK
         path: bin/*.apk
+
